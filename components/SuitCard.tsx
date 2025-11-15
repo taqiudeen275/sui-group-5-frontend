@@ -7,9 +7,11 @@ interface SuitCardProps {
   suit: SuitUI;
   currentUser: Profile;
   onLike: (suitId: string) => void;
+  onComment?: (suitId: string) => void;
+  onRepost?: (suitId: string) => void;
 }
 
-const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike }) => {
+const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onComment, onRepost }) => {
     const { author, createdAt, body, likes, reposts, comments, isRepost, originalAuthor } = suit;
     const isLiked = likes.includes(currentUser.id);
 
@@ -46,18 +48,24 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike }) => {
                 </div>
                 <p className="text-on-surface mt-1 whitespace-pre-wrap">{body}</p>
                 <div className="flex justify-between mt-4 max-w-sm text-on-surface-secondary">
-                    <div className="flex items-center space-x-2 group cursor-pointer">
+                    <button 
+                        onClick={() => onComment?.(suit.id)} 
+                        className="flex items-center space-x-2 group focus:outline-none"
+                    >
                         <div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
                             <MessageCircle className="w-5 h-5 group-hover:text-primary transition-colors" />
                         </div>
                         <span className="text-sm">{comments.length}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 group cursor-pointer">
+                    </button>
+                    <button 
+                        onClick={() => onRepost?.(suit.id)} 
+                        className="flex items-center space-x-2 group focus:outline-none"
+                    >
                         <div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
                            <Repeat2 className="w-5 h-5 group-hover:text-green-500 transition-colors" />
                         </div>
                         <span className="text-sm">{reposts}</span>
-                    </div>
+                    </button>
                     <button onClick={() => onLike(suit.id)} className="flex items-center space-x-2 group focus:outline-none">
                         <div className={`p-2 rounded-full group-hover:bg-pink-500/10 transition-colors ${isLiked ? 'bg-pink-500/10' : ''}`}>
                             {isLiked ? (

@@ -9,9 +9,11 @@ interface FeedProps {
   currentUser: Profile;
   onCreateSuit: (body: string) => void;
   onLikeSuit: (suitId: string) => void;
+  onComment?: (suitId: string) => void;
+  onRepost?: (suitId: string) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSuit }) => {
+const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSuit, onComment, onRepost }) => {
   return (
     <div>
       <div className="sticky top-0 bg-background/80 backdrop-blur-md z-10 p-4 border-b border-border">
@@ -20,7 +22,14 @@ const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSui
       <CreateSuitForm currentUser={currentUser} onSubmit={onCreateSuit} />
       <div>
         {suits.map(suit => (
-          <SuitCard key={suit.id} suit={suit} currentUser={currentUser} onLike={onLikeSuit} />
+          <SuitCard 
+            key={suit.id} 
+            suit={suit} 
+            currentUser={currentUser} 
+            onLike={onLikeSuit}
+            onComment={onComment}
+            onRepost={onRepost}
+          />
         ))}
       </div>
     </div>

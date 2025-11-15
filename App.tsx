@@ -6,17 +6,22 @@ import Feed from './components/Feed';
 import Modal from './components/common/Modal';
 import CreateSuitForm from './components/CreateSuitForm';
 import CreateProfile from './components/CreateProfile';
+import CommentModal from './components/CommentModal';
 import { useProfile } from './src/hooks/useProfile';
 import { useSuits } from './src/hooks/useSuits';
 import { useLikes } from './src/hooks/useLikes';
+import { useComments } from './src/hooks/useComments';
+import type { SuitUI } from './types';
 
 const App: React.FC = () => {
   const account = useCurrentAccount();
-  const { profile, isLoading: profileLoading } = useProfile();
-  const { suits, createSuit, isLoading: suitsLoading } = useSuits();
+  const { profile } = useProfile();
+  const { suits, createSuit, repostSuit, isLoading: suitsLoading } = useSuits();
   const { likeSuit, unlikeSuit, isLiked, getLikeId } = useLikes();
+  const { addComment } = useComments();
   const [isComposeModalOpen, setComposeModalOpen] = useState(false);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
+  const [commentingSuit, setCommentingSuit] = useState<SuitUI | null>(null);
   
   const handleCreateSuit = async (body: string) => {
     try {
@@ -41,6 +46,50 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Error toggling like:", error);
       alert(error instanceof Error ? error.message : "Failed to toggle like");
+    }
+  };
+
+  const handleComment = (suitId: string) => {
+    const suit = suits.find(s => s.suit.id === suitId);
+    if (suit) {
+      const suitUI: SuitUI = {
+        id: suit.suit.id,
+        body: suit.suit.body,
+        createdAt: suit.suit.createdAt,
+        author: suit.author,
+        comments: [],
+        reposts: suit.store.repostCount || 0,
+        likes: [],
+        isRepost: suit.isRepost,
+        originalAuthor: suit.originalAuthor,
+        storeId: suit.store.id,
+      };
+      setCommentingSuit(suitUI);
+    }
+  };
+
+  const handleAddComment = async (storeId: string, text: string) => {
+    try {
+      await addComment(storeId, text);
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      throw error;
+    }
+  };
+
+  const handleRepost = async (suitId: string) => {
+    try {
+      const suit = suits.find(s => s.suit.id === suitId);
+      if (!suit) return;
+
+      const confirmed = window.confirm('Repost this suit?');
+      if (!confirmed) return;
+
+      await repostSuit(suitId, suit.store.id);
+      alert('Suit reposted successfully!');
+    } catch (error) {
+      console.error("Error reposting:", error);
+      alert(error instanceof Error ? error.message : "Failed to repost");
     }
   };
 
@@ -120,6 +169,8 @@ const App: React.FC = () => {
                 handleLikeSuit(suit.store.id);
               }
             }}
+            onComment={handleComment}
+            onRepost={handleRepost}
           />
         </main>
         
@@ -150,6 +201,18 @@ const App: React.FC = () => {
         <Modal isOpen={isComposeModalOpen} onClose={() => setComposeModalOpen(false)} title="Compose Suit">
           <CreateSuitForm currentUser={currentUser} onSubmit={handleCreateSuit} />
         </Modal>
+
+        {/* Comment Modal */}
+        {commentingSuit && (
+          <Modal isOpen={true} onClose={() => setCommentingSuit(null)} title="Reply">
+            <CommentModal 
+              suit={commentingSuit}
+              currentUser={currentUser}
+              onSubmit={handleAddComment}
+              onClose={() => setCommentingSuit(null)}
+            />
+          </Modal>
+        )}
     </div>
   );
 };

@@ -96,6 +96,7 @@ export function useSuits(): UseSuitsReturn {
             const eventData = event.parsedJson as any;
             const suitId = eventData.suit_store_id; // This is actually the suit ID
             const authorAddress = eventData.author;
+            const transactionDigest = event.id.txDigest;
 
             // Fetch the suit object
             const suitObject = await suiClient.getObject({
@@ -114,18 +115,72 @@ export function useSuits(): UseSuitsReturn {
 
             const suit = transformSuit(suitData);
 
-            // Create a placeholder store (we can't easily query the actual shared store)
-            const store: SuiStore = {
-              id: `placeholder_${suitId}`,
-              suit: suitId,
-              comments: new Map(),
-              repost: new Map(),
-              likes: new Map(),
-              createdAt: suit.createdAt,
-              likesCount: 0,
-              commentsCount: 0,
-              repostCount: 0,
-            };
+            // Get the transaction to find the created SuiStore object
+            let storeId: string | null = null;
+            try {
+              const txResponse = await suiClient.getTransactionBlock({
+                digest: transactionDigest,
+                options: {
+                  showObjectChanges: true,
+                },
+              });
+
+              // Find the created SuiStore object
+              const objectChanges = txResponse.objectChanges || [];
+              for (const change of objectChanges) {
+                if (
+                  change.type === 'created' &&
+                  change.objectType.includes('::suitter::SuiStore')
+                ) {
+                  storeId = change.objectId;
+                  break;
+                }
+              }
+            } catch (err) {
+              console.warn("Could not fetch transaction for store ID:", err);
+            }
+
+            // If we couldn't find the store ID, skip this suit
+            if (!storeId) {
+              console.warn("Could not find store ID for suit:", suitId);
+              return null;
+            }
+
+            // Fetch the actual store object
+            let store: SuiStore;
+            try {
+              const storeObject = await suiClient.getObject({
+                id: storeId,
+                options: {
+                  showContent: true,
+                },
+              });
+
+              if (storeObject.data?.content && storeObject.data.content.dataType === "moveObject") {
+                const storeData = parseObjectContent<SuiStoreData>(storeObject);
+                if (storeData) {
+                  store = transformSuiStore(storeData);
+                } else {
+                  throw new Error("Could not parse store data");
+                }
+              } else {
+                throw new Error("Store object not found");
+              }
+            } catch (err) {
+              console.warn("Could not fetch store object:", err);
+              // Fallback to placeholder
+              store = {
+                id: storeId,
+                suit: suitId,
+                comments: new Map(),
+                repost: new Map(),
+                likes: new Map(),
+                createdAt: suit.createdAt,
+                likesCount: 0,
+                commentsCount: 0,
+                repostCount: 0,
+              };
+            }
 
             // Fetch author profile
             let author: Profile;
