@@ -1,7 +1,7 @@
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ENTRY_FUNCTIONS, MODULES, SUITTER_PACKAGE_ID } from "../lib/constants";
+import { ENTRY_FUNCTIONS, MODULES, SUITTER_PACKAGE_ID, GAS_BUDGET } from "../lib/constants";
 import { parseTransactionError } from "../lib/error-utils";
 
 interface StoreLikeData {
@@ -84,6 +84,7 @@ export function useLikes(): UseLikesReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.CREATE_LIKE);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.SUITTER}::${ENTRY_FUNCTIONS.CREATE_AND_KEEP_LIKE}`,
@@ -115,6 +116,7 @@ export function useLikes(): UseLikesReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.UNLIKE_SUIT);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.SUITTER}::${ENTRY_FUNCTIONS.UNLIKE_SUIT}`,

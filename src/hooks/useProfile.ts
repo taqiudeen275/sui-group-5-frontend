@@ -1,7 +1,7 @@
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ENTRY_FUNCTIONS, MODULES, STRUCT_TYPES, SUITTER_PACKAGE_ID, UI_CONSTANTS, PROFILE_REGISTRY_ID } from "../lib/constants";
+import { ENTRY_FUNCTIONS, MODULES, STRUCT_TYPES, SUITTER_PACKAGE_ID, UI_CONSTANTS, PROFILE_REGISTRY_ID, GAS_BUDGET } from "../lib/constants";
 import { extractObjectId, parseObjectContent, parseTimestamp } from "../lib/sui-client";
 import { parseTransactionError } from "../lib/error-utils";
 import type { CreateProfileInput, Profile, ProfileData } from "../../types";
@@ -89,6 +89,7 @@ export function useProfile(): UseProfileReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.CREATE_PROFILE);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.PROFILE}::${ENTRY_FUNCTIONS.CREATE_AND_KEEP_PROFILE}`,
@@ -126,6 +127,7 @@ export function useProfile(): UseProfileReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.UPDATE_PROFILE);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.PROFILE}::${ENTRY_FUNCTIONS.UPDATE_PROFILE_BIO}`,
@@ -161,6 +163,7 @@ export function useProfile(): UseProfileReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.UPDATE_PROFILE);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.PROFILE}::${ENTRY_FUNCTIONS.UPDATE_PROFILE_IMAGE_URL}`,

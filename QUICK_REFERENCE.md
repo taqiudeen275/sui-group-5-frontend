@@ -29,8 +29,22 @@ export const SUITTER_PACKAGE_ID = "0xYOUR_PACKAGE_ID";
 
 ### Update Registry ID
 ```typescript
-// src/hooks/useProfile.ts
-const PROFILE_REGISTRY_ID = "0xYOUR_REGISTRY_ID";
+// src/lib/constants.ts
+export const PROFILE_REGISTRY_ID = "0xYOUR_REGISTRY_ID";
+```
+
+### Gas Budgets (Optional)
+```typescript
+// src/lib/constants.ts
+export const GAS_BUDGET = {
+  CREATE_PROFILE: 100_000_000,    // 0.1 SUI
+  UPDATE_PROFILE: 50_000_000,     // 0.05 SUI
+  CREATE_SUIT: 50_000_000,        // 0.05 SUI
+  CREATE_LIKE: 30_000_000,        // 0.03 SUI
+  UNLIKE_SUIT: 30_000_000,        // 0.03 SUI
+  CREATE_COMMENT: 50_000_000,     // 0.05 SUI
+  REPOST_SUIT: 50_000_000,        // 0.05 SUI
+};
 ```
 
 ## 🎣 Using Hooks

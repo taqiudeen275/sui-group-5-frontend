@@ -48,3 +48,14 @@ export const UI_CONSTANTS = {
   QUERY_STALE_TIME: 5 * 60 * 1000, // 5 minutes
   QUERY_CACHE_TIME: 10 * 60 * 1000, // 10 minutes
 } as const;
+
+// Gas Budget Constants (in MIST, 1 SUI = 1,000,000,000 MIST)
+export const GAS_BUDGET = {
+  CREATE_PROFILE: 100_000_000, // 0.1 SUI
+  UPDATE_PROFILE: 50_000_000, // 0.05 SUI
+  CREATE_SUIT: 50_000_000, // 0.05 SUI
+  CREATE_LIKE: 30_000_000, // 0.03 SUI
+  UNLIKE_SUIT: 30_000_000, // 0.03 SUI
+  CREATE_COMMENT: 50_000_000, // 0.05 SUI
+  REPOST_SUIT: 50_000_000, // 0.05 SUI
+} as const;

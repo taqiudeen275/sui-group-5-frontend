@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const { suits, createSuit, isLoading: suitsLoading } = useSuits();
   const { likeSuit, unlikeSuit, isLiked, getLikeId } = useLikes();
   const [isComposeModalOpen, setComposeModalOpen] = useState(false);
+  const [showProfileCreation, setShowProfileCreation] = useState(false);
   
   const handleCreateSuit = async (body: string) => {
     try {
@@ -57,7 +58,7 @@ const App: React.FC = () => {
   }
 
   // Show loading state
-  if (profileLoading || suitsLoading) {
+  if (suitsLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -67,18 +68,35 @@ const App: React.FC = () => {
     );
   }
 
-  // Show profile creation if no profile
-  if (!profile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <CreateProfile />
-      </div>
-    );
-  }
+  // Create a default user object if no profile exists
+  const currentUser = profile || {
+    id: account.address,
+    owner: account.address,
+    username: `User ${account.address.slice(0, 6)}`,
+    bio: '',
+    profileImageUrl: 'https://picsum.photos/200',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
 
   return (
     <div className="flex min-h-screen max-w-7xl mx-auto">
-        <Sidebar currentUser={profile} onCompose={() => setComposeModalOpen(true)} />
+        {/* Show profile creation banner if no profile */}
+        {!profile && (
+          <div className="fixed top-0 left-0 right-0 bg-primary text-white p-3 text-center z-50">
+            <p className="inline-block mr-4">
+              Create your profile to get the full Suitter experience!
+            </p>
+            <button
+              onClick={() => setShowProfileCreation(true)}
+              className="bg-white text-primary px-4 py-1 rounded-full font-bold hover:bg-gray-100"
+            >
+              Create Profile
+            </button>
+          </div>
+        )}
+
+        <Sidebar currentUser={currentUser} onCompose={() => setComposeModalOpen(true)} />
 
         <main className="flex-1 border-r border-border">
           <Feed 
@@ -94,7 +112,7 @@ const App: React.FC = () => {
               originalAuthor: suitWithStore.originalAuthor,
               storeId: suitWithStore.store.id,
             }))}
-            currentUser={profile}
+            currentUser={currentUser}
             onCreateSuit={handleCreateSuit}
             onLikeSuit={(suitId) => {
               const suit = suits.find(s => s.suit.id === suitId);
@@ -123,8 +141,14 @@ const App: React.FC = () => {
           </div>
         </aside>
 
+        {/* Profile Creation Modal */}
+        <Modal isOpen={showProfileCreation} onClose={() => setShowProfileCreation(false)} title="Create Profile">
+          <CreateProfile />
+        </Modal>
+
+        {/* Compose Suit Modal */}
         <Modal isOpen={isComposeModalOpen} onClose={() => setComposeModalOpen(false)} title="Compose Suit">
-            <CreateSuitForm currentUser={profile} onSubmit={handleCreateSuit} />
+          <CreateSuitForm currentUser={currentUser} onSubmit={handleCreateSuit} />
         </Modal>
     </div>
   );

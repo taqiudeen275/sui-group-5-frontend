@@ -1,7 +1,7 @@
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ENTRY_FUNCTIONS, MODULES, STRUCT_TYPES, SUITTER_PACKAGE_ID, UI_CONSTANTS } from "../lib/constants";
+import { ENTRY_FUNCTIONS, MODULES, STRUCT_TYPES, SUITTER_PACKAGE_ID, UI_CONSTANTS, GAS_BUDGET } from "../lib/constants";
 import { extractObjectId, parseObjectContent, parseTimestamp } from "../lib/sui-client";
 import { parseTransactionError } from "../lib/error-utils";
 import type { Profile, ProfileData, Suit, SuitData, SuiStore, SuiStoreData, SuitWithStore } from "../../types";
@@ -180,6 +180,7 @@ export function useSuits(): UseSuitsReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.CREATE_SUIT);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.SUITTER}::${ENTRY_FUNCTIONS.CREATE_AND_KEEP_SUIT}`,
@@ -210,6 +211,7 @@ export function useSuits(): UseSuitsReturn {
       }
 
       const tx = new Transaction();
+      tx.setGasBudget(GAS_BUDGET.REPOST_SUIT);
 
       tx.moveCall({
         target: `${SUITTER_PACKAGE_ID}::${MODULES.SUITTER}::${ENTRY_FUNCTIONS.REPOST_AND_KEEP_SUIT}`,
