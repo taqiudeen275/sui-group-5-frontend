@@ -1,222 +1,257 @@
 # Suitter - Decentralized Social Platform on Sui
 
-A Twitter-like decentralized social media platform built on the Sui blockchain using Move smart contracts.
+A Twitter-like decentralized social media platform built on the Sui blockchain using Move smart contracts. Share your thoughts, engage with the community, and experience true ownership of your social data.
+
+🌐 **Live Demo**: [https://sui-group-5-frontend.vercel.app/](https://sui-group-5-frontend.vercel.app/)
+
+## 👥 Team Members
+
+| Name | Email | GitHub |
+|------|-------|--------|
+| Ashong Abdallah | ashongabdalla51@gmail.com | [@ashongdev](http://github.com/ashongdev/) |
+| Abdulai Taqiudeen | atarqiudeen@gmail.com | [@taqiudeen275](https://github.com/taqiudeen275) |
+| Bassell Dari Iddisah | bbasssell16@gmail.com | [@Bassell-Iddisah](https://github.com/Bassell-Iddisah) |
+| Sharif Iddrisu| mrgem156@gmail.com | [@noblex1](https://github.com/noblex1/) |
 
 ## 🌟 Features
 
-- **Decentralized Profiles**: Create and manage your profile on-chain
-- **Suits (Posts)**: Share your thoughts with the community
-- **Likes**: Show appreciation for great content
-- **Comments**: Engage in conversations
-- **Reposts**: Share content you love
-- **Real-time Updates**: See new content as it's posted
-- **Wallet Integration**: Connect with any Sui-compatible wallet
+- **Decentralized Profiles**: Create and manage your profile on-chain with username, bio, and profile image
+- **Suits (Posts)**: Share your thoughts with the community (up to 280 characters)
+- **Likes**: Show appreciation for great content with on-chain likes
+- **Comments**: Engage in conversations on posts
+- **Real-time Updates**: See new content as it's posted to the blockchain
+- **Wallet Integration**: Seamless connection with Sui-compatible wallets
+- **Responsive Design**: Works beautifully on desktop and mobile devices
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm (or npm/yarn)
-- Sui wallet browser extension
-- Deployed Suitter smart contracts
+- Node.js 18 or higher
+- pnpm (recommended) or npm/yarn
+- Sui wallet browser extension (Sui Wallet, Suiet, or Ethos)
+- Sui testnet tokens (get from [Sui Discord faucet](https://discord.gg/sui))
 
 ### Installation
 
 ```bash
-# Install dependencies
+# Clone the repository
+git clone <repository-url>
+cd suitter-frontend
+
+# Install frontend dependencies
+cd frontend
 pnpm install
 
-# Configure environment
+# Configure environment variables
 cp .env.example .env.local
-# Edit .env.local with your settings
-
-# Update contract IDs (see SETUP.md)
-# - SUITTER_PACKAGE_ID in src/lib/constants.ts
-# - PROFILE_REGISTRY_ID in src/hooks/useProfile.ts
+# Edit .env.local with your contract IDs
 
 # Start development server
 pnpm dev
 ```
 
-Visit `http://localhost:5173` and connect your wallet!
+Visit `http://localhost:5173` and connect your wallet to start using Suitter!
 
-## 📚 Documentation
-
-- **[SETUP.md](./SETUP.md)** - Complete setup instructions
-- **[INTEGRATION.md](./INTEGRATION.md)** - Technical integration details
-- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick reference for developers
-- **[FIND_REGISTRY_ID.md](./FIND_REGISTRY_ID.md)** - How to find ProfileRegistry ID
-- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Pre-deployment checklist
-- **[INTEGRATION_SUMMARY.md](./INTEGRATION_SUMMARY.md)** - Integration overview
-
-## 🏗️ Architecture
-
-### Tech Stack
-
-- **Frontend**: React 19 + TypeScript
-- **Blockchain**: Sui Network (Move smart contracts)
-- **State Management**: React Query (TanStack Query)
-- **Wallet**: Mysten dApp Kit
-- **Build Tool**: Vite
-- **Styling**: Custom CSS with Tailwind-like utilities
-
-### Project Structure
+## 📁 Project Structure
 
 ```
 suitter-frontend/
-├── src/
-│   ├── hooks/              # Blockchain interaction hooks
-│   │   ├── useProfile.ts   # Profile management
-│   │   ├── useSuits.ts     # Suit/post management
-│   │   ├── useLikes.ts     # Like management
-│   │   └── useComments.ts  # Comment management
-│   ├── lib/                # Utilities and constants
-│   │   ├── constants.ts    # Contract IDs and config
-│   │   ├── sui-client.ts   # Sui client utilities
-│   │   └── error-utils.ts  # Error handling
-│   └── networkConfig.ts    # Network configuration
-├── components/             # React components
-│   ├── common/            # Reusable UI components
-│   ├── CreateProfile.tsx  # Profile creation form
-│   ├── Feed.tsx           # Main feed
-│   ├── Sidebar.tsx        # Navigation
-│   └── SuitCard.tsx       # Post card
-├── types.ts               # TypeScript definitions
-├── App.tsx                # Main app component
-└── index.tsx              # Entry point with providers
+├── contracts/              # Move smart contracts
+│   ├── sources/
+│   │   ├── profile.move   # User profile management
+│   │   ├── suitter.move   # Core suit/post functionality
+│   │   ├── like.move      # Like system
+│   │   └── comment.move   # Comment system
+│   └── tests/             # Smart contract tests
+│
+└── frontend/              # React frontend application
+    ├── components/        # React components
+    │   ├── CreateProfile.tsx
+    │   ├── Feed.tsx
+    │   ├── SuitCard.tsx
+    │   ├── Sidebar.tsx
+    │   └── common/        # Reusable UI components
+    ├── src/
+    │   ├── hooks/         # Custom React hooks for blockchain
+    │   └── lib/           # Utilities and constants
+    ├── types.ts           # TypeScript type definitions
+    └── App.tsx            # Main application component
 ```
+
+## 🏗️ Tech Stack
+
+### Frontend
+- **Framework**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **State Management**: React Query (TanStack Query)
+- **Blockchain SDK**: Mysten dApp Kit
+- **Styling**: Custom CSS
+
+### Smart Contracts
+- **Language**: Move
+- **Blockchain**: Sui Network
+- **Network**: Testnet
+
+## 🎯 Usage Guide
+
+### 1. Connect Your Wallet
+- Click the "Connect Wallet" button in the top right
+- Select your Sui wallet extension
+- Approve the connection request
+
+### 2. Create Your Profile
+- Enter a unique username
+- Add a bio (optional)
+- Provide a profile image URL (optional)
+- Approve the transaction in your wallet
+
+### 3. Create a Suit (Post)
+- Type your message in the "What's happening?" box
+- Keep it under 280 characters
+- Click "Post" and approve the transaction
+
+### 4. Interact with Content
+- **Like**: Click the heart icon on any suit
+- **Comment**: Click the comment icon to add your thoughts
+- **View Profile**: Click on usernames to see profiles
 
 ## 🔧 Configuration
 
-### Required Configuration
+### Smart Contract Deployment
 
-1. **Package ID**: Update in `src/lib/constants.ts`
-   ```typescript
-   export const SUITTER_PACKAGE_ID = "0xYOUR_PACKAGE_ID";
-   ```
+1. Deploy the Move contracts:
+```bash
+cd contracts
+sui client publish --gas-budget 100000000
+```
 
-2. **Profile Registry ID**: Update in `src/hooks/useProfile.ts`
-   ```typescript
-   const PROFILE_REGISTRY_ID = "0xYOUR_REGISTRY_ID";
-   ```
+2. Note the Package ID and ProfileRegistry object ID from the output
 
-3. **Network**: Set in `index.tsx` (testnet/devnet/mainnet)
+3. Update the frontend configuration:
+   - Update `SUITTER_PACKAGE_ID` in `frontend/src/lib/constants.ts`
+   - Update `PROFILE_REGISTRY_ID` in `frontend/src/hooks/useProfile.ts`
 
-See [SETUP.md](./SETUP.md) for detailed instructions.
+See `frontend/SETUP.md` for detailed instructions.
 
-## 🎯 Usage
+## 📚 Documentation
 
-### Connect Wallet
-1. Click "Connect Wallet"
-2. Select your Sui wallet
-3. Approve the connection
+Detailed documentation is available in the `frontend/` directory:
 
-### Create Profile
-1. Enter username and bio
-2. Optionally add profile image URL
-3. Approve the transaction
-
-### Create a Suit (Post)
-1. Type your message (max 280 characters)
-2. Click "Post"
-3. Approve the transaction
-
-### Interact with Suits
-- **Like**: Click the heart icon
-- **Comment**: Click the comment icon (coming soon)
-- **Repost**: Click the repost icon (coming soon)
+- **[SETUP.md](./frontend/SETUP.md)** - Complete setup and configuration guide
+- **[INTEGRATION.md](./frontend/INTEGRATION.md)** - Technical integration details
+- **[DEPLOYMENT_CHECKLIST.md](./frontend/DEPLOYMENT_CHECKLIST.md)** - Pre-deployment checklist
+- **[QUICK_REFERENCE.md](./frontend/QUICK_REFERENCE.md)** - Developer quick reference
+- **[FEATURES_IMPLEMENTED.md](./frontend/FEATURES_IMPLEMENTED.md)** - Feature implementation status
 
 ## 🧪 Testing
 
+### Frontend Testing
 ```bash
-# Run development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Preview production build
-pnpm preview
+cd frontend
+pnpm dev  # Development server
+pnpm build  # Production build
+pnpm preview  # Preview production build
 ```
 
-### Get Testnet SUI
-Visit the [Sui Discord](https://discord.gg/sui) and use the faucet in the #testnet-faucet channel.
-
-## 📦 Smart Contract Integration
-
-This frontend integrates with the following Move modules:
-
-- **profile**: User profile management
-- **suitter**: Suit creation and interactions
-- **like**: Like functionality
-- **comment**: Comment system
-
-See [INTEGRATION.md](./INTEGRATION.md) for technical details.
-
-## 🔐 Security
-
-- No private keys stored in frontend
-- All transactions require wallet approval
-- Input validation on all forms
-- User-friendly error messages
-- Secure communication with Sui network
+### Smart Contract Testing
+```bash
+cd contracts
+sui move test
+```
 
 ## 🚢 Deployment
 
-See [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) for complete deployment guide.
+The application is deployed at: **[https://sui-group-5-frontend.vercel.app/](https://sui-group-5-frontend.vercel.app/)**
 
-### Quick Deploy
+### Deploy Your Own Instance
 
 ```bash
-# Build
+# Build the frontend
+cd frontend
 pnpm build
 
 # Deploy to Vercel
 vercel deploy
 
 # Or deploy to Netlify
-netlify deploy
+netlify deploy --dir=dist
 ```
+
+See `frontend/DEPLOYMENT_CHECKLIST.md` for a complete deployment guide.
+
+## 🔐 Security Features
+
+- No private keys stored in the application
+- All transactions require explicit wallet approval
+- Input validation on all user inputs
+- Secure communication with Sui network via official SDKs
+- User-friendly error messages without exposing sensitive data
+
+## 🛠️ Development
+
+### Running Locally
+
+```bash
+# Terminal 1: Start frontend
+cd frontend
+pnpm dev
+
+# Terminal 2: Watch for contract changes (optional)
+cd contracts
+sui move build --watch
+```
+
+### Code Style
+
+- TypeScript for type safety
+- React functional components with hooks
+- Modular component architecture
+- Custom hooks for blockchain interactions
+- Comprehensive error handling
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+We welcome contributions! To contribute:
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📝 License
 
-MIT License - see LICENSE file for details
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
+## 🆘 Support & Resources
 
-- Check [SETUP.md](./SETUP.md) for setup issues
-- Review [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for API usage
-- Visit [Sui Discord](https://discord.gg/sui) for community support
-- Check [Sui Documentation](https://docs.sui.io/) for blockchain questions
+- **Sui Documentation**: [https://docs.sui.io/](https://docs.sui.io/)
+- **Sui Discord**: [https://discord.gg/sui](https://discord.gg/sui)
+- **Sui Explorer**: [https://suiexplorer.com/](https://suiexplorer.com/)
+- **Mysten dApp Kit**: [https://sdk.mystenlabs.com/dapp-kit](https://sdk.mystenlabs.com/dapp-kit)
 
-## 🔗 Links
+## 🎯 Roadmap
 
-- [Sui Network](https://sui.io/)
-- [Sui Documentation](https://docs.sui.io/)
-- [Mysten dApp Kit](https://sdk.mystenlabs.com/dapp-kit)
-- [Sui Explorer](https://suiexplorer.com/)
+- [x] User profiles with on-chain storage
+- [x] Create and view suits (posts)
+- [x] Like functionality
+- [x] Comment system
+- [ ] Repost/share functionality
+- [ ] User profile pages
+- [ ] Follow/unfollow system
+- [ ] Search and discovery
+- [ ] Notifications
+- [ ] Direct messaging
+- [ ] Media uploads (images/videos)
+- [ ] Hashtags and trending topics
 
-## ✨ Features Coming Soon
+## 🏆 Acknowledgments
 
-- Comment display and creation UI
-- Repost UI
-- User profile pages
-- Search functionality
-- Notifications
-- Direct messages
-- Follow/unfollow system
+- Built on the [Sui blockchain](https://sui.io/)
+- Powered by [Mysten Labs](https://mystenlabs.com/) technology
+- Inspired by decentralized social media principles
 
 ---
 
-Built with ❤️ on Sui
+**Built with ❤️ on Sui** | [Live Demo](https://sui-group-5-frontend.vercel.app/) | [Report Bug](../../issues) | [Request Feature](../../issues)
