@@ -8,12 +8,13 @@ interface FeedProps {
   suits: SuitUI[];
   currentUser: Profile;
   onCreateSuit: (body: string) => void;
-  onLikeSuit: (suitId: string) => void;
+  onLikeSuit: (suitId: string) => Promise<void>;
   onComment?: (suitId: string) => void;
-  onRepost?: (suitId: string) => void;
+  onRepost?: (suitId: string) => Promise<void>;
+  isLikedByUser?: (suitId: string) => boolean;
 }
 
-const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSuit, onComment, onRepost }) => {
+const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSuit, onComment, onRepost, isLikedByUser }) => {
   return (
     <div>
       <div className="sticky top-0 bg-background/80 backdrop-blur-md z-10 p-4 border-b border-border">
@@ -29,6 +30,7 @@ const Feed: React.FC<FeedProps> = ({ suits, currentUser, onCreateSuit, onLikeSui
             onLike={onLikeSuit}
             onComment={onComment}
             onRepost={onRepost}
+            isLikedByUser={isLikedByUser ? isLikedByUser(suit.id) : false}
           />
         ))}
       </div>

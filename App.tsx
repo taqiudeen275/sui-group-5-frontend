@@ -171,14 +171,18 @@ const App: React.FC = () => {
             })}
             currentUser={currentUser}
             onCreateSuit={handleCreateSuit}
-            onLikeSuit={(suitId) => {
+            onLikeSuit={async (suitId) => {
               const suit = suits.find(s => s.suit.id === suitId);
               if (suit) {
-                handleLikeSuit(suit.store.id);
+                await handleLikeSuit(suit.store.id);
               }
             }}
             onComment={handleComment}
             onRepost={handleRepost}
+            isLikedByUser={(suitId) => {
+              const suit = suits.find(s => s.suit.id === suitId);
+              return suit ? isLiked(suit.store.id) : false;
+            }}
           />
         </main>
         

@@ -1,20 +1,24 @@
 
-import React from 'react';
-import { MessageCircle, Repeat2, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, Repeat2, Heart, Loader2 } from 'lucide-react';
 import type { SuitUI, Profile } from '../types';
 
 interface SuitCardProps {
   suit: SuitUI;
   currentUser: Profile;
-  onLike: (suitId: string) => void;
+  onLike: (suitId: string) => Promise<void>;
   onComment?: (suitId: string) => void;
-  onRepost?: (suitId: string) => void;
+  onRepost?: (suitId: string) => Promise<void>;
+  isLikedByUser?: boolean;
 }
 
-const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onComment, onRepost }) => {
-    const { author, createdAt, body, likes, likesCount, reposts, comments, isRepost, originalAuthor } = suit;
-    const isLiked = likes.includes(currentUser.id);
-    const displayLikesCount = likesCount !== undefined ? likesCount : likes.length;
+const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onComment, onRepost, isLikedByUser = false }) => {
+    const { author, createdAt, body, likesCount, reposts, comments, isRepost, originalAuthor } = suit;
+    const displayLikesCount = likesCount !== undefined ? likesCount : 0;
+    
+    const [isLiking, setIsLiking] = useState(false);
+    const [isReposting, setIsReposting] = useState(false);
+    const [localIsLiked, setLocalIsLiked] = useState(isLikedByUser);
 
     const timeAgo = (date: number) => {
         const seconds = Math.floor((new Date().getTime() - date) / 1000);
@@ -59,23 +63,54 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onCommen
                         <span className="text-sm">{comments.length}</span>
                     </button>
                     <button 
-                        onClick={() => onRepost?.(suit.id)} 
-                        className="flex items-center space-x-2 group focus:outline-none"
+                        onClick={async () => {
+                            if (!onRepost) return;
+                            setIsReposting(true);
+                            try {
+                                await onRepost(suit.id);
+                            } catch (error) {
+                                console.error('Error reposting:', error);
+                            } finally {
+                                setIsReposting(false);
+                            }
+                        }}
+                        disabled={isReposting}
+                        className="flex items-center space-x-2 group focus:outline-none disabled:opacity-50"
                     >
                         <div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
-                           <Repeat2 className="w-5 h-5 group-hover:text-green-500 transition-colors" />
+                           {isReposting ? (
+                               <Loader2 className="w-5 h-5 animate-spin text-green-500" />
+                           ) : (
+                               <Repeat2 className="w-5 h-5 group-hover:text-green-500 transition-colors" />
+                           )}
                         </div>
                         <span className="text-sm">{reposts}</span>
                     </button>
-                    <button onClick={() => onLike(suit.id)} className="flex items-center space-x-2 group focus:outline-none">
-                        <div className={`p-2 rounded-full group-hover:bg-pink-500/10 transition-colors ${isLiked ? 'bg-pink-500/10' : ''}`}>
-                            {isLiked ? (
+                    <button 
+                        onClick={async () => {
+                            setIsLiking(true);
+                            try {
+                                await onLike(suit.id);
+                                setLocalIsLiked(!localIsLiked);
+                            } catch (error) {
+                                console.error('Error liking suit:', error);
+                            } finally {
+                                setIsLiking(false);
+                            }
+                        }}
+                        disabled={isLiking}
+                        className="flex items-center space-x-2 group focus:outline-none disabled:opacity-50"
+                    >
+                        <div className={`p-2 rounded-full group-hover:bg-pink-500/10 transition-colors ${localIsLiked ? 'bg-pink-500/10' : ''}`}>
+                            {isLiking ? (
+                                <Loader2 className="w-5 h-5 animate-spin text-pink-500" />
+                            ) : localIsLiked ? (
                                 <Heart className="w-5 h-5 text-pink-500 fill-pink-500 transition-colors" />
                             ) : (
                                 <Heart className="w-5 h-5 group-hover:text-pink-500 transition-colors" />
                             )}
                         </div>
-                        <span className={`text-sm transition-colors ${isLiked ? 'text-pink-500' : ''}`}>{displayLikesCount}</span>
+                        <span className={`text-sm transition-colors ${localIsLiked ? 'text-pink-500' : ''}`}>{displayLikesCount}</span>
                     </button>
                 </div>
             </div>
