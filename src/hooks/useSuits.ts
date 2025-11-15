@@ -105,7 +105,6 @@ export function useSuits(): UseSuitsReturn {
               },
             });
 
-            if (!suitObject.da
             if (!suitObject.data?.content || suitObject.data.content.dataType !== "moveObject") {
               return null;
             }
@@ -115,33 +114,21 @@ export function useSuits(): UseSuitsReturn {
 
             const suit = transformSuit(suitData);
 
-            // Now we need to find the SuiStore that references this suit
-            // Since SuiStore is shared, we query all SuiStore objects and find the one with matching suit ID
-            // This is inefficient but works for small scale. In production, use an indexer.
-            let store: SuiStore | null = null;
-            
-            try {
-              // Query for SuiStore objects (they are shared, so we can't query by owner)
-              // We'll use a workaround: query events to get store IDs, then check each one
-              // For now, let's create a minimal store object from the event data
-              store = {
-                id: `store_${suitId}`, // Placeholder - we don't have the actual store ID from events
-                suit: suitId,
-                comments: new Map(),
-                repost: new Map(),
-                likes: new Map(),
-                createdAt: suit.createdAt,
-                likesCount: 0,
-                commentsCount: 0,
-                repostCount: 0,
-              };
-            } catch (err) {
-              console.warn("Could not fetch store for suit:", suitId);
-              return null;
-            }
+            // Create a placeholder store (we can't easily query the actual shared store)
+            const store: SuiStore = {
+              id: `placeholder_${suitId}`,
+              suit: suitId,
+              comments: new Map(),
+              repost: new Map(),
+              likes: new Map(),
+              createdAt: suit.createdAt,
+              likesCount: 0,
+              commentsCount: 0,
+              repostCount: 0,
+            };
 
             // Fetch author profile
-            let author: Profile | undefined;
+            let author: Profile;
             try {
               const profileResponse = await suiClient.getOwnedObjects({
                 owner: authorAddress,
@@ -157,14 +144,14 @@ export function useSuits(): UseSuitsReturn {
                 const profileData = parseObjectContent<ProfileData>(profileResponse.data[0]);
                 if (profileData) {
                   author = transformProfile(profileData);
+                } else {
+                  throw new Error("No profile data");
                 }
+              } else {
+                throw new Error("No profile found");
               }
             } catch (err) {
-              console.warn("Could not fetch profile for author:", authorAddress);
-            }
-
-            // If no profile, create a default one
-            if (!author) {
+              // Create default profile
               author = {
                 id: authorAddress,
                 owner: authorAddress,
@@ -183,13 +170,13 @@ export function useSuits(): UseSuitsReturn {
               isRepost: false,
             };
           } catch (err) {
-            console.error("Error fetching suit details:", err);
+            console.error("Error fetching suit:", err);
             return null;
           }
         });
 
-        const suitsWithStore = await Promise.all(suitsWithStorePromises);
-        const validSuits = suitsWithStore.filter((item): item is SuitWithStore => item !== null);
+        const fetchedSuits = await Promise.all(suitsPromises);
+        const validSuits = fetchedSuits.filter((item): item is SuitWithStore => item !== null);
 
         // Sort by creation time (newest first)
         validSuits.sort((a, b) => b.suit.createdAt - a.suit.createdAt);
