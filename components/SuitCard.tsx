@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { MessageCircle, Repeat2, Heart } from 'lucide-react';
 import type { SuitUI, Profile } from '../types';
-import { CommentIcon, RepostIcon, LikeIcon } from './common/Icons';
 
 interface SuitCardProps {
   suit: SuitUI;
@@ -34,7 +34,7 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike }) => {
             <div className="flex-1">
                 {isRepost && originalAuthor && (
                     <div className="text-sm text-on-surface-secondary mb-1 flex items-center space-x-2">
-                        <RepostIcon className="w-4 h-4" />
+                        <Repeat2 className="w-4 h-4" />
                         <span>{author.username} reposted</span>
                     </div>
                 )}
@@ -46,23 +46,27 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike }) => {
                 </div>
                 <p className="text-on-surface mt-1 whitespace-pre-wrap">{body}</p>
                 <div className="flex justify-between mt-4 max-w-sm text-on-surface-secondary">
-                    <div className="flex items-center space-x-2 group">
-                        <div className="p-2 rounded-full group-hover:bg-primary/10">
-                            <CommentIcon className="group-hover:text-primary"/>
+                    <div className="flex items-center space-x-2 group cursor-pointer">
+                        <div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
+                            <MessageCircle className="w-5 h-5 group-hover:text-primary transition-colors" />
                         </div>
-                        <span>{comments.length}</span>
+                        <span className="text-sm">{comments.length}</span>
                     </div>
-                    <div className="flex items-center space-x-2 group">
-                        <div className="p-2 rounded-full group-hover:bg-green-500/10">
-                           <RepostIcon className="group-hover:text-green-500"/>
+                    <div className="flex items-center space-x-2 group cursor-pointer">
+                        <div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
+                           <Repeat2 className="w-5 h-5 group-hover:text-green-500 transition-colors" />
                         </div>
-                        <span>{reposts}</span>
+                        <span className="text-sm">{reposts}</span>
                     </div>
                     <button onClick={() => onLike(suit.id)} className="flex items-center space-x-2 group focus:outline-none">
-                        <div className={`p-2 rounded-full group-hover:bg-pink-500/10 ${isLiked ? 'text-pink-500' : ''}`}>
-                            <LikeIcon className={`group-hover:text-pink-500 ${isLiked ? 'text-pink-500' : ''}`}/>
+                        <div className={`p-2 rounded-full group-hover:bg-pink-500/10 transition-colors ${isLiked ? 'bg-pink-500/10' : ''}`}>
+                            {isLiked ? (
+                                <Heart className="w-5 h-5 text-pink-500 fill-pink-500 transition-colors" />
+                            ) : (
+                                <Heart className="w-5 h-5 group-hover:text-pink-500 transition-colors" />
+                            )}
                         </div>
-                        <span className={`${isLiked ? 'text-pink-500' : ''}`}>{likes.length}</span>
+                        <span className={`text-sm transition-colors ${isLiked ? 'text-pink-500' : ''}`}>{likes.length}</span>
                     </button>
                 </div>
             </div>
