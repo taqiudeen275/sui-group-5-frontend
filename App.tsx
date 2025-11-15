@@ -22,6 +22,7 @@ const App: React.FC = () => {
   const [isComposeModalOpen, setComposeModalOpen] = useState(false);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
   const [commentingSuit, setCommentingSuit] = useState<SuitUI | null>(null);
+  const [currentView, setCurrentView] = useState<'home' | 'profile'>('home');
   
   const handleCreateSuit = async (body: string) => {
     try {
@@ -137,19 +138,28 @@ const App: React.FC = () => {
               Create your profile to get the full Suitter experience!
             </p>
             <button
-              onClick={() => setShowProfileCreation(true)}
-              className="bg-white text-primary px-4 py-1 rounded-full font-bold hover:bg-gray-100"
+              onClick={() => {
+                console.log('Opening profile creation modal');
+                setShowProfileCreation(true);
+              }}
+              className="bg-white text-primary px-4 py-1 rounded-full font-bold hover:bg-gray-100 transition-colors"
             >
               Create Profile
             </button>
           </div>
         )}
 
-        <Sidebar currentUser={currentUser} onCompose={() => setComposeModalOpen(true)} />
+        <Sidebar 
+          currentUser={currentUser} 
+          onCompose={() => setComposeModalOpen(true)}
+          currentView={currentView}
+          onNavigate={setCurrentView}
+        />
 
         <main className="flex-1 border-r border-border">
-          <Feed 
-            suits={suits.map(suitWithStore => {
+          {currentView === 'home' ? (
+            <Feed 
+              suits={suits.map(suitWithStore => {
               const storeId = suitWithStore.store.id;
               const likeData = getLikeCount(storeId);
               const commentCount = getCommentCount(storeId);
@@ -184,6 +194,41 @@ const App: React.FC = () => {
               return suit ? isLiked(suit.store.id) : false;
             }}
           />
+          ) : (
+            <div className="border-b border-border">
+              <div className="p-4">
+                <h1 className="text-2xl font-bold">Profile</h1>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center space-x-4 mb-6">
+                  <ProfileImage 
+                    src={currentUser.profileImageUrl} 
+                    alt={currentUser.username}
+                    size="lg"
+                  />
+                  <div>
+                    <h2 className="text-xl font-bold">{currentUser.username}</h2>
+                    <p className="text-on-surface-secondary">@{currentUser.username.toLowerCase()}</p>
+                  </div>
+                </div>
+                {currentUser.bio && (
+                  <p className="text-on-surface mb-4">{currentUser.bio}</p>
+                )}
+                <div className="text-on-surface-secondary text-sm">
+                  <p>Joined {new Date(currentUser.createdAt).toLocaleDateString()}</p>
+                  <p className="mt-2">Address: {currentUser.owner.slice(0, 6)}...{currentUser.owner.slice(-4)}</p>
+                </div>
+                {!profile && (
+                  <button
+                    onClick={() => setShowProfileCreation(true)}
+                    className="mt-6 bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary-hover transition-colors"
+                  >
+                    Complete Your Profile
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </main>
         
         <aside className="w-96 hidden lg:block p-4">
@@ -205,9 +250,11 @@ const App: React.FC = () => {
         </aside>
 
         {/* Profile Creation Modal */}
-        <Modal isOpen={showProfileCreation} onClose={() => setShowProfileCreation(false)} title="Create Profile">
-          <CreateProfile />
-        </Modal>
+        {showProfileCreation && (
+          <Modal isOpen={showProfileCreation} onClose={() => setShowProfileCreation(false)} title="Create Profile">
+            <CreateProfile onSuccess={() => setShowProfileCreation(false)} />
+          </Modal>
+        )}
 
         {/* Compose Suit Modal */}
         <Modal isOpen={isComposeModalOpen} onClose={() => setComposeModalOpen(false)} title="Compose Suit">
