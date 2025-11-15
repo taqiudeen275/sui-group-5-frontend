@@ -1,0 +1,5 @@
+{
+  "name": "Suitter - A Decentralized Social Platform",
+  "description": "A Twitter-clone application built on React and Tailwind CSS, inspired by the provided Sui Move smart contract. It features a decentralized social feed where users can post 'Suits', comment, like, and repost content, all conceptually backed by a blockchain.",
+  "requestFramePermissions": []
+}
