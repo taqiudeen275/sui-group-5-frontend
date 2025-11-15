@@ -70,85 +70,98 @@ export function useSuits(): UseSuitsReturn {
     queryKey: ["suits"],
     queryFn: async () => {
       try {
-        if (!account?.address) {
+        // Query all SuiStore objects (they are shared objects)
+        // Note: This is a simplified approach. In production, use an indexer or event-based approach
+        const storesResponse = await suiClient.queryEvents({
+          query: {
+            MoveEventType: `${SUITTER_PACKAGE_ID}::${MODULES.SUITTER}::SuitCreated`,
+          },
+          limit: 50,
+          order: "descending",
+        });
+
+        if (!storesResponse.data || storesResponse.data.length === 0) {
           return [];
         }
 
-        const suitsResponse = await suiClient.getOwnedObjects({
-          owner: account.address,
-          filter: {
-            StructType: STRUCT_TYPES.SUIT,
-          },
-          options: {
-            showContent: true,
-            showType: true,
-            showOwner: true,
-          },
-        });
+        // Fetch each suit and its store
+        const suitsWithStorePromises = storesResponse.data.map(async (event) => {
+          try {
+            const eventData = event.parsedJson as any;
+            const storeId = eventData.suit_store_id;
+            const authorAddress = eventData.author;
 
-        const storesResponse = await suiClient.getOwnedObjects({
-          owner: account.address,
-          filter: {
-            StructType: STRUCT_TYPES.SUI_STORE,
-          },
-          options: {
-            showContent: true,
-            showType: true,
-            showOwner: true,
-          },
-        });
+            // Fetch the store object
+            const storeObject = await suiClient.getObject({
+              id: storeId,
+              options: {
+                showContent: true,
+                showType: true,
+              },
+            });
 
-        const profilesResponse = await suiClient.getOwnedObjects({
-          owner: account.address,
-          filter: {
-            StructType: STRUCT_TYPES.PROFILE,
-          },
-          options: {
-            showContent: true,
-            showType: true,
-            showOwner: true,
-          },
-        });
-
-        const suitsList = suitsResponse.data
-          .map((obj) => {
-            const suitData = parseObjectContent<SuitData>(obj);
-            const owner = obj.data?.owner;
-            const ownerAddress = typeof owner === "object" && owner !== null && "AddressOwner" in owner 
-              ? owner.AddressOwner 
-              : null;
-            return suitData ? { suit: transformSuit(suitData), owner: ownerAddress } : null;
-          })
-          .filter((item): item is { suit: Suit; owner: string | null } => item !== null);
-
-        const storesList = storesResponse.data
-          .map((obj) => {
-            const storeData = parseObjectContent<SuiStoreData>(obj);
-            return storeData ? transformSuiStore(storeData) : null;
-          })
-          .filter((store): store is SuiStore => store !== null);
-
-        const profilesList = profilesResponse.data
-          .map((obj) => {
-            const profileData = parseObjectContent<ProfileData>(obj);
-            return profileData ? transformProfile(profileData) : null;
-          })
-          .filter((profile): profile is Profile => profile !== null);
-
-        const storesMap = new Map(storesList.map((store) => [store.suit, store]));
-        const profilesMap = new Map(profilesList.map((profile) => [profile.owner, profile]));
-
-        const suitsWithStore: SuitWithStore[] = suitsList
-          .map(({ suit, owner }) => {
-            const store = storesMap.get(suit.id);
-            
-            let author: Profile | undefined;
-            if (owner) {
-              author = profilesMap.get(owner);
+            if (!storeObject.data?.content || storeObject.data.content.dataType !== "moveObject") {
+              return null;
             }
 
-            if (!store || !author) {
+            const storeData = parseObjectContent<SuiStoreData>(storeObject);
+            if (!storeData) return null;
+
+            const store = transformSuiStore(storeData);
+            const suitId = store.suit;
+
+            // Fetch the suit object
+            const suitObject = await suiClient.getObject({
+              id: suitId,
+              options: {
+                showContent: true,
+                showType: true,
+              },
+            });
+
+            if (!suitObject.data?.content || suitObject.data.content.dataType !== "moveObject") {
               return null;
+            }
+
+            const suitData = parseObjectContent<SuitData>(suitObject);
+            if (!suitData) return null;
+
+            const suit = transformSuit(suitData);
+
+            // Fetch author profile
+            let author: Profile | undefined;
+            try {
+              const profileResponse = await suiClient.getOwnedObjects({
+                owner: authorAddress,
+                filter: {
+                  StructType: STRUCT_TYPES.PROFILE,
+                },
+                options: {
+                  showContent: true,
+                },
+              });
+
+              if (profileResponse.data.length > 0) {
+                const profileData = parseObjectContent<ProfileData>(profileResponse.data[0]);
+                if (profileData) {
+                  author = transformProfile(profileData);
+                }
+              }
+            } catch (err) {
+              console.warn("Could not fetch profile for author:", authorAddress);
+            }
+
+            // If no profile, create a default one
+            if (!author) {
+              author = {
+                id: authorAddress,
+                owner: authorAddress,
+                username: `User ${authorAddress.slice(0, 6)}`,
+                bio: '',
+                profileImageUrl: 'https://picsum.photos/200',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+              };
             }
 
             return {
@@ -157,12 +170,19 @@ export function useSuits(): UseSuitsReturn {
               author,
               isRepost: false,
             };
-          })
-          .filter((item): item is SuitWithStore => item !== null);
+          } catch (err) {
+            console.error("Error fetching suit details:", err);
+            return null;
+          }
+        });
 
-        suitsWithStore.sort((a, b) => b.suit.createdAt - a.suit.createdAt);
+        const suitsWithStore = await Promise.all(suitsWithStorePromises);
+        const validSuits = suitsWithStore.filter((item): item is SuitWithStore => item !== null);
 
-        return suitsWithStore;
+        // Sort by creation time (newest first)
+        validSuits.sort((a, b) => b.suit.createdAt - a.suit.createdAt);
+
+        return validSuits;
       } catch (err) {
         console.error("Error fetching suits:", err);
         throw err;
