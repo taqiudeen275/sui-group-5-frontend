@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import type { Suit, Profile } from '../types';
+import type { SuitUI, Profile } from '../types';
 import { CommentIcon, RepostIcon, LikeIcon } from './common/Icons';
 
 interface SuitCardProps {
-  suit: Suit;
+  suit: SuitUI;
   currentUser: Profile;
   onLike: (suitId: string) => void;
 }

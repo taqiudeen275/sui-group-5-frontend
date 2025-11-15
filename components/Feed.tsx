@@ -1,11 +1,11 @@
 
 import React from 'react';
-import type { Suit, Profile } from '../types';
+import type { SuitUI, Profile } from '../types';
 import CreateSuitForm from './CreateSuitForm';
 import SuitCard from './SuitCard';
 
 interface FeedProps {
-  suits: Suit[];
+  suits: SuitUI[];
   currentUser: Profile;
   onCreateSuit: (body: string) => void;
   onLikeSuit: (suitId: string) => void;
