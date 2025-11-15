@@ -1,18 +1,21 @@
 
 import React from 'react';
+import ProfileImage from './ProfileImage';
 import type { Profile } from '../types';
 import { HomeIcon, ProfileIcon } from './common/Icons';
 
 interface SidebarProps {
   currentUser: Profile;
   onCompose: () => void;
+  currentView?: 'home' | 'profile';
+  onNavigate?: (view: 'home' | 'profile') => void;
 }
 
-const SidebarLink: React.FC<{ Icon: React.ElementType; text: string; active?: boolean }> = ({ Icon, text, active = false }) => (
-    <a href="#" className="flex items-center space-x-4 p-3 rounded-full hover:bg-white/10 transition-colors duration-200">
+const SidebarLink: React.FC<{ Icon: React.ElementType; text: string; active?: boolean; onClick?: () => void }> = ({ Icon, text, active = false, onClick }) => (
+    <button onClick={onClick} className="flex items-center space-x-4 p-3 rounded-full hover:bg-white/10 transition-colors duration-200">
         <Icon className="w-7 h-7" />
         <span className={`text-xl ${active ? 'font-bold' : ''}`}>{text}</span>
-    </a>
+    </button>
 );
 
 const Sidebar: React.FC<SidebarProps> = ({ currentUser, onCompose }) => {
@@ -48,7 +51,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentUser, onCompose }) => {
             </button>
         </div>
         <div className="flex items-center space-x-3 p-2 rounded-full hover:bg-white/10 cursor-pointer">
-            <img src={currentUser.profileImageUrl} alt="Your avatar" className="w-10 h-10 rounded-full"/>
+            <ProfileImage 
+                src={currentUser.profileImageUrl} 
+                alt={currentUser.username}
+                size="md"
+            />
             <div className="hidden lg:block">
                 <p className="font-bold">{currentUser.username}</p>
                 <p className="text-on-surface-secondary">@{currentUser.username.toLowerCase()}</p>

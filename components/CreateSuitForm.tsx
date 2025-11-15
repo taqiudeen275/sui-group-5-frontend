@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import ProfileImage from './ProfileImage';
 import type { Profile } from '../types';
 import { generateSuitContent } from '../services/geminiService';
 import { AIGenerateIcon } from './common/Icons';
@@ -36,7 +37,11 @@ const CreateSuitForm: React.FC<CreateSuitFormProps> = ({ currentUser, onSubmit }
   return (
     <div className="p-4 border-b border-border">
       <div className="flex space-x-4">
-        <img src={currentUser.profileImageUrl} alt="Your avatar" className="w-12 h-12 rounded-full" />
+        <ProfileImage 
+          src={currentUser.profileImageUrl} 
+          alt={currentUser.username}
+          size="md"
+        />
         <div className="flex-1">
           <form onSubmit={handleSubmit}>
             <textarea

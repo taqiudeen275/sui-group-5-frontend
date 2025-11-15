@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { MessageCircle, Repeat2, Heart, Loader2 } from 'lucide-react';
+import ProfileImage from './ProfileImage';
 import type { SuitUI, Profile } from '../types';
 
 interface SuitCardProps {
@@ -37,7 +38,11 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onCommen
 
     return (
         <div className="flex space-x-4 p-4 border-b border-border hover:bg-white/5 transition-colors duration-200">
-            <img src={author.profileImageUrl} alt={`${author.username}'s avatar`} className="w-12 h-12 rounded-full" />
+            <ProfileImage 
+                src={author.profileImageUrl} 
+                alt={author.username}
+                size="md"
+            />
             <div className="flex-1">
                 {isRepost && originalAuthor && (
                     <div className="text-sm text-on-surface-secondary mb-1 flex items-center space-x-2">

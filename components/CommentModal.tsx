@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ProfileImage from './ProfileImage';
 import type { SuitUI, Profile } from '../types';
 
 interface CommentModalProps {
@@ -33,10 +34,10 @@ const CommentModal: React.FC<CommentModalProps> = ({ suit, currentUser, onSubmit
     <div className="p-4 border rounded-xl">
       {/* Original Suit */}
       <div className="flex space-x-3 mb-4 pb-4 border-b border-border">
-        <img 
+        <ProfileImage 
           src={suit.author.profileImageUrl} 
-          alt={suit.author.username} 
-          className="w-10 h-10 rounded-full"
+          alt={suit.author.username}
+          size="md"
         />
         <div className="flex-1">
           <div className="flex items-center space-x-2">
@@ -52,10 +53,10 @@ const CommentModal: React.FC<CommentModalProps> = ({ suit, currentUser, onSubmit
       {/* Comment Form */}
       <form onSubmit={handleSubmit}>
         <div className="flex space-x-3">
-          <img 
+          <ProfileImage 
             src={currentUser.profileImageUrl} 
-            alt={currentUser.username} 
-            className="w-10 h-10 rounded-full"
+            alt={currentUser.username}
+            size="md"
           />
           <div className="flex-1">
             <textarea

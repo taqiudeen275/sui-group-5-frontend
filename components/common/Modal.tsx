@@ -14,11 +14,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center"
+      className="fixed inset-0 bg-black bg-opacity-60 z-[100] flex justify-center items-center"
       onClick={onClose}
     >
       <div
-        className="bg-background rounded-2xl w-full max-w-lg mx-4"
+        className="bg-background rounded-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">

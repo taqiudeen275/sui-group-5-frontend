@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useProfile } from '../src/hooks/useProfile';
 
-const CreateProfile: React.FC = () => {
+interface CreateProfileProps {
+  onSuccess?: () => void;
+}
+
+const CreateProfile: React.FC<CreateProfileProps> = ({ onSuccess }) => {
   const { createProfile } = useProfile();
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -20,15 +24,18 @@ const CreateProfile: React.FC = () => {
         bio,
         profileImageUrl: profileImageUrl || 'https://picsum.photos/200',
       });
+      // Success! Call the callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create profile');
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-surface rounded-lg shadow-lg">
+    <div className="w-full">
       <h2 className="text-2xl font-bold mb-6">Create Your Profile</h2>
       
       {error && (
