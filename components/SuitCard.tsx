@@ -12,8 +12,9 @@ interface SuitCardProps {
 }
 
 const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onComment, onRepost }) => {
-    const { author, createdAt, body, likes, reposts, comments, isRepost, originalAuthor } = suit;
+    const { author, createdAt, body, likes, likesCount, reposts, comments, isRepost, originalAuthor } = suit;
     const isLiked = likes.includes(currentUser.id);
+    const displayLikesCount = likesCount !== undefined ? likesCount : likes.length;
 
     const timeAgo = (date: number) => {
         const seconds = Math.floor((new Date().getTime() - date) / 1000);
@@ -74,7 +75,7 @@ const SuitCard: React.FC<SuitCardProps> = ({ suit, currentUser, onLike, onCommen
                                 <Heart className="w-5 h-5 group-hover:text-pink-500 transition-colors" />
                             )}
                         </div>
-                        <span className={`text-sm transition-colors ${isLiked ? 'text-pink-500' : ''}`}>{likes.length}</span>
+                        <span className={`text-sm transition-colors ${isLiked ? 'text-pink-500' : ''}`}>{displayLikesCount}</span>
                     </button>
                 </div>
             </div>

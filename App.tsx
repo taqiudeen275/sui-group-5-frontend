@@ -17,8 +17,8 @@ const App: React.FC = () => {
   const account = useCurrentAccount();
   const { profile } = useProfile();
   const { suits, createSuit, repostSuit, isLoading: suitsLoading } = useSuits();
-  const { likeSuit, unlikeSuit, isLiked, getLikeId } = useLikes();
-  const { addComment } = useComments();
+  const { likeSuit, unlikeSuit, isLiked, getLikeId, getLikeCount } = useLikes();
+  const { addComment, getCommentCount } = useComments();
   const [isComposeModalOpen, setComposeModalOpen] = useState(false);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
   const [commentingSuit, setCommentingSuit] = useState<SuitUI | null>(null);
@@ -149,18 +149,26 @@ const App: React.FC = () => {
 
         <main className="flex-1 border-r border-border">
           <Feed 
-            suits={suits.map(suitWithStore => ({
-              id: suitWithStore.suit.id,
-              body: suitWithStore.suit.body,
-              createdAt: suitWithStore.suit.createdAt,
-              author: suitWithStore.author,
-              comments: [],
-              reposts: suitWithStore.store.repostCount || 0,
-              likes: [],
-              isRepost: suitWithStore.isRepost,
-              originalAuthor: suitWithStore.originalAuthor,
-              storeId: suitWithStore.store.id,
-            }))}
+            suits={suits.map(suitWithStore => {
+              const storeId = suitWithStore.store.id;
+              const likeData = getLikeCount(storeId);
+              const commentCount = getCommentCount(storeId);
+              const liked = isLiked(storeId);
+              
+              return {
+                id: suitWithStore.suit.id,
+                body: suitWithStore.suit.body,
+                createdAt: suitWithStore.suit.createdAt,
+                author: suitWithStore.author,
+                comments: Array(commentCount).fill(null), // Placeholder array for count
+                reposts: suitWithStore.store.repostCount || 0,
+                likes: liked ? [currentUser.id] : [], // Show as liked if user has liked
+                likesCount: likeData,
+                isRepost: suitWithStore.isRepost,
+                originalAuthor: suitWithStore.originalAuthor,
+                storeId: storeId,
+              };
+            })}
             currentUser={currentUser}
             onCreateSuit={handleCreateSuit}
             onLikeSuit={(suitId) => {

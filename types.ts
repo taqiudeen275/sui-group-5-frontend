@@ -91,6 +91,7 @@ export interface SuitUI extends Suit {
   comments: Comment[];
   reposts: number;
   likes: string[];
+  likesCount?: number;
   isRepost: boolean;
   originalAuthor?: Profile;
   storeId?: string;
